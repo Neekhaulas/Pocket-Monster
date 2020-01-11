@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-public class PC
+public class PC : File
 {
     const uint GFModelPackageMagic = 0x15122117;
     const uint GFMaterialPackageMagic = 0x15041213;
@@ -12,7 +12,7 @@ public class PC
     const uint GFResourcePackageMagic = 0x00010000;
 
     string magic;
-    List<int> files;
+    List<File> files;
 
     public PC()
     {
@@ -21,6 +21,7 @@ public class PC
 
     public void load(Reader reader)
     {
+        Debug.Log(reader.available);
         Reader origin = reader.subreader();
 
         magic = origin.readString(2);
@@ -30,7 +31,8 @@ public class PC
             throw new System.Exception("Invalid magic for PC: " + magic);
         }
 
-        ushort count = reader.getUint16();
+        ushort count = reader.readUint16();
+        Debug.Log(count);
 
         List<uint> offsets = new List<uint>();
         int looper = 0;
@@ -40,40 +42,47 @@ public class PC
             looper++;
         }
 
-        List<Reader> files = new List<Reader>();
+        List<Reader> readerFiles = new List<Reader>();
         int index = 0;
         while(index < count)
         {
             uint offset = offsets[index];
+            Debug.Log(offsets.Count);
+            Debug.Log(offsets[index]);
+            Debug.Log(offsets[index + 1]);
             uint length = offsets[index + 1] - offsets[index];
-            files.Add(origin.subreader(offset, length));
+            readerFiles.Add(origin.subreader(offset, length));
             index++;
         }
 
-        foreach(Reader fileReader in files)
+        foreach(Reader fileReader in readerFiles)
         {
             string type = guessFileType(reader);
+            File result = null;
             switch (type)
             {
-                case "model": { this.next(new Model(reader)); break; }
-                case "motion": { this.next(new Motion(reader)); break; }
-                case "shader": { this.next(new Shader(reader)); break; }
-                case "texture": { this.next(new Texture(reader)); break; }
-                case "meta": { this.next(new Meta(reader)); break; }
-                case "package": { this.next(new Package(reader)); break; }
-                case "resource": { this.next(new Resource(reader)); break; }
+                case "model": { result = new Model(reader); break; }
+                /*case "motion": { result = new Motion(reader); break; }
+                case "shader": { result = new Shader(reader); break; }
+                case "texture": { result = new Texture(reader); break; }
+                case "meta": { result = new Meta(reader); break; }
+                case "package": { result = new Package(reader); break; }
+                case "resource": { result = Resource(reader); break; }*/
                 case "pc":
                     {
                         PC newPC = new PC();
-                        return newPC.load(reader);
+                        newPC.load(reader);
+                        result = newPC;
+                        break;
                     }
-                case "empty": { return null; }
+                case "empty": { break; }
                 case "unknown": { throw new Exception("Unknown file format"); }
                 default:
                     {
                         throw new Exception("Invalid file format");
                     }
             }
+            this.files.Add(result);
         }
     }
 

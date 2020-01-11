@@ -286,7 +286,9 @@
 /define:ENABLE_TIMELINE
 /define:CSHARP_7_OR_LATER
 /define:CSHARP_7_3_OR_NEWER
+"Assets/Scripts/File.cs"
 "Assets/Scripts/Loader.cs"
 "Assets/Scripts/Model.cs"
 "Assets/Scripts/PC.cs"
+"Assets/Scripts/Section.cs"
 "Assets/Scripts/Test.cs"

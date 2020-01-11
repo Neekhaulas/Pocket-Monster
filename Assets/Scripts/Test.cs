@@ -86,7 +86,6 @@ public class Test : MonoBehaviour
                     offset++;
                     if(pokemon.file + pokemon.modelsCount <= file)
                     {
-                        Debug.Log("Loaded " + PokemonsNames[id]);
                         pokemon.modelsCount = 0;
                         id++;
                         offset = 0;
@@ -99,7 +98,8 @@ public class Test : MonoBehaviour
 
     public void loadPokemon(int id, int offset)
     {
-        var pokemon = Pokemons[id - 1];
+        Debug.Log(Pokemons[id].name);
+        var pokemon = Pokemons[id];
 
         int origin = (pokemon.file + offset) * 9 + 1;
 

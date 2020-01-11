@@ -48,7 +48,8 @@ public class Reader
         this.buffer = buffer;
         this.begin = offset;
         this.end = this.buffer.BaseStream.Length;
-        if(this.begin + length < this.end)
+        Debug.Log(end);
+        if (this.begin + length < this.end)
         {
             this.end = this.begin + length;
         }
